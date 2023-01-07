@@ -1,5 +1,6 @@
 ﻿using MealsOrderAPI.Models;
 using Microsoft.EntityFrameworkCore;
+using System.Diagnostics.Metrics;
 
 namespace MealsOrderAPI.Context
 {
@@ -7,5 +8,8 @@ namespace MealsOrderAPI.Context
     {
         public MealsOrderContext(DbContextOptions<MealsOrderContext> option): base(option) { }
         public DbSet<User> Users { get; set; }
+        public virtual DbSet<Meal> Meal { get; set; }
+        public virtual DbSet<MealOrder> MealOrder { get; set; }
+        public virtual DbSet<Menu> Menu { get; set; }
     }
 }
