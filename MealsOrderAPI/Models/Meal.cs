@@ -18,7 +18,7 @@ namespace MealsOrderAPI.Models
         public int PeopleCount { get; set; }
         [Required]
         public DateTime ExpireTime { get; set; }
-        public Status Status { get; set; } = Common.Status.Normal;
+        public string Status { get; set; } 
         public int Issuer { get; set; }
         public DateTime CreatedTime { get; set; }
         public DateTime UpdateTime { get; set; }

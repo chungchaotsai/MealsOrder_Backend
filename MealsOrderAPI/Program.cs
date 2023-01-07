@@ -20,10 +20,7 @@ namespace MealsOrderAPI
             var DatabaseSettings =
                 builder.Configuration.GetSection("MealsOrder").Get<DatabaseSettings>();
 
-            builder.Services.AddDbContext<MealsOrderContext>(x =>
-            {
-                x.UseSqlServer(DatabaseSettings.ConnectionString);
-            });
+            builder.Services.AddDbContext<MealsOrderContext>(x => x.UseSqlServer(DatabaseSettings.ConnectionString));
             // Add services to the container.
 
             builder.Services.AddControllers().AddOData(opt => opt.AddRouteComponents("v1",GetEdmModel()).Filter().Select().OrderBy().Expand());

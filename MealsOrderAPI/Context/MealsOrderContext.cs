@@ -7,9 +7,9 @@ namespace MealsOrderAPI.Context
     public class MealsOrderContext: DbContext
     {
         public MealsOrderContext(DbContextOptions<MealsOrderContext> option): base(option) { }
-        public DbSet<User> Users { get; set; }
-        public virtual DbSet<Meal> Meal { get; set; }
-        public virtual DbSet<MealOrder> MealOrder { get; set; }
-        public virtual DbSet<Menu> Menu { get; set; }
+        public virtual DbSet<User> Users { get; set; }
+        public virtual DbSet<Meal> Meals { get; set; }
+        public virtual DbSet<MealOrder> MealOrders { get; set; }
+        public virtual DbSet<Menu> Menus { get; set; }
     }
 }

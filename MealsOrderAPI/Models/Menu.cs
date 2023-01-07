@@ -14,9 +14,9 @@ namespace MealsOrderAPI.Models
         public string Phone { get; set; }
         public string Address { get; set; }
         public int LowConsumption { get; set; }
-        public DayOfWeek[] OffDay { get; set; }
+        public string OffDay { get; set; }
         public string Image { get; set; }
-        public Status Status { get; set; }
+        public string Status { get; set; }
         public DateTime UpdateTime { get; set; }
     }
 }

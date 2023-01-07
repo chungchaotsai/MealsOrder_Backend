@@ -15,7 +15,7 @@ namespace MealsOrderAPI.Models
         public int MealId { get; set; }
         [Required]
         public int UserId { get; set; }
-        public IEnumerable<MealOrderUnit> items { get; set; }
+        //public IEnumerable<MealOrderUnit> items { get; set; }
         public int Amount { get; set; }
         public DateTime CreatedTime { get; set; }
         public DateTime UpdateTime { get; set; }
@@ -45,7 +45,7 @@ namespace MealsOrderAPI.Models
         public string? Address { get; set; }
         public int Amount { get; set; }
         public IEnumerable<MealOrderUnit>? Items { get; set; }
-        public Status Status { get; set; } = Common.Status.Normal;
+        public string Status { get; set; }
     }
     /// <summary>
     /// 帳務用
