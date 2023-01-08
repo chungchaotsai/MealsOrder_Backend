@@ -9,9 +9,10 @@ using Microsoft.AspNetCore.OData.Routing.Controllers;
 
 namespace MealsOrderAPI.Controllers
 {
-    [Route("api/v1/[controller]")]
-    [ApiController]
-    public class UsersController : ControllerBase
+    /// <summary>
+    /// User operation
+    /// </summary>
+    public class UsersController : ODataController
     {
         private readonly IUsersRepository _usersRepository;
         public UsersController(
