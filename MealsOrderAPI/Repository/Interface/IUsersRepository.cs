@@ -1,10 +1,11 @@
 ﻿using MealsOrderAPI.Models;
+using Microsoft.AspNetCore.OData.Results;
 using System;
 
 namespace MealsOrderAPI.Repository.Interface
 {
-    public interface IUsersRepository
+    public interface IUsersRepository : IRepository<User>
     {
-        public IQueryable<User> GetAll();
+        Task<SingleResult<User>> Get(int id);
     }
 }

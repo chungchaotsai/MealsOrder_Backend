@@ -35,7 +35,7 @@ namespace MealsOrderAPI
                     .OrderBy()
                     .Count()
                     .SetMaxTop(100)
-                    .AddRouteComponents("api",GetEdmModel()));
+                    .AddRouteComponents("api", GetEdmModel()).Filter().Select().Expand());
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen(c =>
@@ -56,7 +56,6 @@ namespace MealsOrderAPI
             app.UseHttpsRedirection();
 
             app.UseAuthorization();
-
 
             app.MapControllers();
 
