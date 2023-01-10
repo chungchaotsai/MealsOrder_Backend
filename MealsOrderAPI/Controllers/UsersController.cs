@@ -67,14 +67,13 @@ namespace MealsOrderAPI.Controllers
             try
             {
                 var u = await _usersRepository.Get(user.Id);
-
-                if (u == null)
+                if (u.Queryable.SingleOrDefault() == null)
                 {
                     _ = _usersRepository.Add(user);
                 }
                 else
                 {
-                    string title = $"User '{user.Id}' not found in DB ToolInfo";
+                    string title = $"User '{user.Id}' not found in DB";
                     return HttpContext.ProblemDetailsError(StatusCodes.Status404NotFound, title);
                 }
             }
@@ -86,8 +85,8 @@ namespace MealsOrderAPI.Controllers
             return Ok();
         }
 
-        [HttpPut]
-        public async Task<IActionResult> Put([FromBody] User user)
+        [HttpPut("api/Users/{id:int}")]
+        public async Task<IActionResult> Put(int id, [FromBody] User user)
         {
             try
             {
@@ -95,7 +94,7 @@ namespace MealsOrderAPI.Controllers
 
                 if (u == null)
                 {
-                    string title = $"User '{user.Id}' not found in DB ToolInfo";
+                    string title = $"User '{user.Id}' not found in DB";
                     return HttpContext.ProblemDetailsError(StatusCodes.Status404NotFound, title);
 
                 }
@@ -112,22 +111,23 @@ namespace MealsOrderAPI.Controllers
             return Ok();
         }
 
-        [HttpDelete]
-        public async Task<IActionResult> Delete([FromBody] User user)
+        [HttpDelete("api/Users/{id:int}")]
+        public async Task<IActionResult> Delete(int Id)
         {
             try
             {
-                var u = await _usersRepository.Get(user.Id);
+                var u = await _usersRepository.Get(Id);
 
                 if (u == null)
                 {
-                    string title = $"User '{user.Id}' not found in DB ToolInfo";
+                    string title = $"User '{Id}' not found in DB";
                     return HttpContext.ProblemDetailsError(StatusCodes.Status404NotFound, title);
 
                 }
                 else
                 {
-                    _ = _usersRepository.Delete(user);
+                    var fuser = new User { Id = Id };
+                    _ = _usersRepository.Delete(fuser);
                 }
             }
             catch (Exception ex)
