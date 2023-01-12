@@ -35,7 +35,7 @@ namespace MealsOrderAPI
                     .OrderBy()
                     .Count()
                     .SetMaxTop(100)
-                    .AddRouteComponents("api", GetEdmModel()).Filter().Select().Expand());
+                    .AddRouteComponents("odata", GetEdmModel()).Filter().Select().Expand());
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen(c =>
@@ -56,7 +56,7 @@ namespace MealsOrderAPI
             app.UseHttpsRedirection();
 
             app.UseAuthorization();
-
+    
             app.MapControllers();
 
             app.Run();
@@ -67,7 +67,9 @@ namespace MealsOrderAPI
             var odataBuilder = new ODataConventionModelBuilder();
             //odataBuilder.EnableLowerCamelCase(); //CamelEntityNaming
 
-            odataBuilder.EntitySet<User>("Users");
+            //odataBuilder.EntitySet<User>("Users");
+            odataBuilder.EntitySet<UserDto>("Users");
+
             return odataBuilder.GetEdmModel();
         }
     }

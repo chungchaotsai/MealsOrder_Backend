@@ -13,13 +13,14 @@ namespace MealsOrderAPI.Models
         public int Id { get; set; }
         [Required]
         public int MunuId { get; set; }
-        public DateTime DealDate { get; set; }
-        public int Amount { get; set; }
-        public int PeopleCount { get; set; }
+        public DateTime MealTime { get; set; }
+        public int IssuerUserId { get; set; }
         [Required]
         public DateTime ExpireTime { get; set; }
+        public int MinimumOrder { get; set; }
+        public int MinimumPeople { get; set; }
+        [Required]
         public string Status { get; set; }
-        public int Issuer { get; set; }
         public DateTime CreatedTime { get; set; }
         public DateTime UpdateTime { get; set; }
     }

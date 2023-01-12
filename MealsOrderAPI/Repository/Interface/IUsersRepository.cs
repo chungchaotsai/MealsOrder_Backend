@@ -6,6 +6,5 @@ namespace MealsOrderAPI.Repository.Interface
 {
     public interface IUsersRepository : IRepository<User>
     {
-        Task<SingleResult<User>> Get(int id);
     }
 }

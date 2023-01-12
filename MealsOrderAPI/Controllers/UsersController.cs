@@ -9,13 +9,14 @@ using Microsoft.AspNetCore.OData.Results;
 using Microsoft.AspNetCore.OData.Routing.Controllers;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.OData.Edm;
-using MealsOrderAPI.Extensions;
 namespace MealsOrderAPI.Controllers
 {
     /// <summary>
     /// User operation
     /// </summary>
-    public class UsersController : ODataController
+    [Route("api/[Controller]")]
+    [ApiController]
+    public class UsersController : ControllerBase
     {
         private readonly IUsersRepository _usersRepository;
         public UsersController(
@@ -26,39 +27,34 @@ namespace MealsOrderAPI.Controllers
         }
 
         //Get all users
-        [EnableQuery(PageSize = 3)]
-        [HttpGet("api/Users")]
-        [HttpGet("api/Users/$count")]
-        public async Task<IQueryable<User>> Get()
+        [HttpGet]
+        [EnableQuery(PageSize = 10)]
+        public IQueryable<UserDto> Get()
         {
-            var result = await _usersRepository.List();
+            var result = _usersRepository.List().Select(u =>
+                new UserDto()
+                {
+                    Id = u.Id,
+                    Name = u.Name,
+                    Email = u.Email,
+                });
+
             return result;
         }
 
-        //[HttpGet("Users({id})")]
-        [HttpGet("{key}")]
+        [HttpGet("{Id}")]
         [EnableQuery]
-        public Task<SingleResult<User>> Get([FromODataUri] int key)
+        public SingleResult<UserDto> Get([FromODataUri] int Id)
         {
-            return _usersRepository.Get(key);
-        }
+            var result = _usersRepository.Get(Id).Queryable.Select(u =>
+                new UserDto()
+                {
+                    Id = u.Id,
+                    Name = u.Name,
+                    Email = u.Email,
+                });
 
-        [HttpGet("api/Users/{key}/Test(name={name})")]
-        public string Sample1(int key, string name)
-        {
-            return $"Send Order({key}) to location at ({name})";
-        }
-
-        [HttpGet]
-        [EnableQuery]
-        public SingleResult<User> sample2([FromODataUri] int key)
-        {
-            var c = new List<User>();
-            c.Add(new User { Id = key });
-            c.Add(new User { Id = key + 1 });
-            var b = c.Where(x => x.Id == key).AsQueryable();
-
-            return new SingleResult<User>(b);
+            return new SingleResult<UserDto>(result);
         }
 
         [HttpPost]
@@ -66,10 +62,10 @@ namespace MealsOrderAPI.Controllers
         {
             try
             {
-                var u = await _usersRepository.Get(user.Id);
+                var u = _usersRepository.Get(user.Id);
                 if (u.Queryable.SingleOrDefault() == null)
                 {
-                    _ = _usersRepository.Add(user);
+                    await _usersRepository.Add(user);
                 }
                 else
                 {
@@ -85,14 +81,14 @@ namespace MealsOrderAPI.Controllers
             return Ok();
         }
 
-        [HttpPut("api/Users/{id:int}")]
+        [HttpPut("{id:int}")]
         public async Task<IActionResult> Put(int id, [FromBody] User user)
         {
             try
             {
-                var u = await _usersRepository.Get(user.Id);
+                var u = _usersRepository.Get(user.Id);
 
-                if (u == null)
+                if (u.Queryable.SingleOrDefault() == null)
                 {
                     string title = $"User '{user.Id}' not found in DB";
                     return HttpContext.ProblemDetailsError(StatusCodes.Status404NotFound, title);
@@ -100,7 +96,7 @@ namespace MealsOrderAPI.Controllers
                 }
                 else
                 {
-                    _ = _usersRepository.Update(user);
+                    await _usersRepository.Update(user);
                 }
             }
             catch (Exception ex)
@@ -111,12 +107,12 @@ namespace MealsOrderAPI.Controllers
             return Ok();
         }
 
-        [HttpDelete("api/Users/{id:int}")]
+        [HttpDelete("{id:int}")]
         public async Task<IActionResult> Delete(int Id)
         {
             try
             {
-                var u = await _usersRepository.Get(Id);
+                var u = _usersRepository.Get(Id);
 
                 if (u == null)
                 {
@@ -127,7 +123,7 @@ namespace MealsOrderAPI.Controllers
                 else
                 {
                     var fuser = new User { Id = Id };
-                    _ = _usersRepository.Delete(fuser);
+                    await _usersRepository.Delete(fuser);
                 }
             }
             catch (Exception ex)

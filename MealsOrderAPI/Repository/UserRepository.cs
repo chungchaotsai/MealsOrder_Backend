@@ -15,12 +15,19 @@ namespace MealsOrderAPI.Repository
         {
             _context = context;
         }
-        public async Task<IQueryable<User>> List()
+        public IQueryable<User> List()
         {
+            try
+            {
+                return _context.Users.AsQueryable();
+            } catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+            }
             return _context.Users.AsQueryable();
         }
         // work around but route path incorrect
-        public async Task<SingleResult<User>> Get(int key)
+        public SingleResult<User> Get(int key)
         {
             var u = _context.Users.Where(p => p.Id == key).AsQueryable();
             return SingleResult.Create(u);
@@ -28,16 +35,15 @@ namespace MealsOrderAPI.Repository
 
         public async Task Add(User user)
         {
-            _ = _context.Users.AddAsync(user);
-            _ = _context.SaveChangesAsync();
-            return;
+             _context.Users.AddAsync(user);
+             await _context.SaveChangesAsync();
         }
 
         public async Task Delete(User user)
         {
             var u = _context.Users.First(p => p.Id == user.Id);
             _context.Users.Remove(u);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
         }
 
         public async Task Update(User user)
@@ -45,7 +51,7 @@ namespace MealsOrderAPI.Repository
             var u = _context.Users.First(p => p.Id == user.Id);
             u.Name = user.Name;
             u.Email = user.Email;
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
         }
 
     }
