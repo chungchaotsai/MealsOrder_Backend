@@ -1,4 +1,5 @@
-﻿using MealsOrderAPI.Context;
+﻿using AutoMapper;
+using MealsOrderAPI.Context;
 using MealsOrderAPI.Extensions;
 using MealsOrderAPI.Models;
 using MealsOrderAPI.Repository.Interface;
@@ -10,7 +11,8 @@ using Microsoft.AspNetCore.OData.Routing.Controllers;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.OData.Edm;
 using Serilog;
-
+using System;
+using AutoMapper.QueryableExtensions;
 namespace MealsOrderAPI.Controllers
 {
     /// <summary>
@@ -22,13 +24,16 @@ namespace MealsOrderAPI.Controllers
     {
         private readonly IUsersRepository _usersRepository;
         private readonly ILogger<UsersController> _logger;
+        private readonly IMapper _mapper;
         public UsersController(
             ILogger<UsersController> logger,
-            IUsersRepository usersRepository
+            IUsersRepository usersRepository,
+            IMapper mapper
             )
         {
             _usersRepository = usersRepository;
             _logger = logger;
+            _mapper = mapper;
         }
 
         //Get all users
@@ -36,13 +41,13 @@ namespace MealsOrderAPI.Controllers
         [EnableQuery(PageSize = 10)]
         public IQueryable<UserDto> Get()
         {
-            var result = _usersRepository.List().Select(u =>
-                new UserDto()
-                {
-                    Id = u.Id,
-                    Name = u.Name,
-                    Email = u.Email,
-                });
+            // 資料庫要對應的欄位 @_@, 就算是null , 也是需要欄位
+            var originalUsers = _usersRepository.List();
+            var result = originalUsers.ProjectTo<UserDto>(_mapper.ConfigurationProvider);
+            //var originalUsers = _usersRepository.List().ToList();
+
+            //var result = _mapper.Map<IEnumerable<User>, IEnumerable<UserDto>>(originalUsers);
+            //var result = _mapper.Map<IQueryable<User>, IQueryable<UserDto>>(originalUsers); 這個不行, 所以改用擴充方法
 
             return result;
         }
@@ -55,7 +60,7 @@ namespace MealsOrderAPI.Controllers
                 new UserDto()
                 {
                     Id = u.Id,
-                    Name = u.Name,
+                    ShowName = u.Name,
                     Email = u.Email,
                 });
 

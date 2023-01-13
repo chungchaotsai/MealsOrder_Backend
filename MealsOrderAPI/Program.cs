@@ -62,6 +62,7 @@ namespace MealsOrderAPI
                     c.SwaggerDoc("v1", new OpenApiInfo { Title = "MealsOrderAPI", Version = "v1" });
                 });
                 builder.Host.UseSerilog();
+                builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
                 var app = builder.Build();
 
                 // Configure the HTTP request pipeline.
