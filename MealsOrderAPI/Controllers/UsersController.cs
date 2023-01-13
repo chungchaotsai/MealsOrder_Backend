@@ -9,6 +9,8 @@ using Microsoft.AspNetCore.OData.Results;
 using Microsoft.AspNetCore.OData.Routing.Controllers;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.OData.Edm;
+using Serilog;
+
 namespace MealsOrderAPI.Controllers
 {
     /// <summary>
@@ -19,11 +21,14 @@ namespace MealsOrderAPI.Controllers
     public class UsersController : ControllerBase
     {
         private readonly IUsersRepository _usersRepository;
+        private readonly ILogger<UsersController> _logger;
         public UsersController(
+            ILogger<UsersController> logger,
             IUsersRepository usersRepository
             )
         {
             _usersRepository = usersRepository;
+            _logger = logger;
         }
 
         //Get all users
