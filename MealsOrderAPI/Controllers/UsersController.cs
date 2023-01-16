@@ -13,6 +13,8 @@ using Microsoft.OData.Edm;
 using Serilog;
 using System;
 using AutoMapper.QueryableExtensions;
+using MealsOrderAPI.Common;
+
 namespace MealsOrderAPI.Controllers
 {
     /// <summary>
@@ -25,16 +27,33 @@ namespace MealsOrderAPI.Controllers
         private readonly IUsersRepository _usersRepository;
         private readonly ILogger<UsersController> _logger;
         private readonly IMapper _mapper;
+        private readonly JwtHelper _jwtHelper;
+
         public UsersController(
             ILogger<UsersController> logger,
             IUsersRepository usersRepository,
-            IMapper mapper
+            IMapper mapper,
+            JwtHelper jwtHelper
             )
         {
             _usersRepository = usersRepository;
             _logger = logger;
             _mapper = mapper;
+            _jwtHelper = jwtHelper;
         }
+
+        [HttpPost("Login")]
+        public async Task<IActionResult> Login([FromBody] Login login)
+        {
+            var token = _jwtHelper.GenerateToken(login.Username);
+            return Ok(new { token });
+        }
+
+        private bool ValidateUser(Login login)
+        {
+            return true;
+        }
+
 
         //Get all users
         [HttpGet]

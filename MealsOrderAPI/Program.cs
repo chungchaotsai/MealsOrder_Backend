@@ -1,4 +1,5 @@
 
+using MealsOrderAPI.Common;
 using MealsOrderAPI.Context;
 using MealsOrderAPI.Logger;
 using MealsOrderAPI.Models;
@@ -12,9 +13,12 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.OData.Edm;
 using Microsoft.OData.ModelBuilder;
 using Microsoft.OpenApi.Models;
+using Microsoft.AspNetCore.Authorization;
 using Serilog;
 using Serilog.Events;
 using Serilog.Settings.Json;
+using JWT.Extensions.AspNetCore;
+
 namespace MealsOrderAPI
 {
     public class Program
@@ -30,14 +34,27 @@ namespace MealsOrderAPI
 
                 var builder = WebApplication.CreateBuilder(args);
 
-                //var settings = new ConfigurationBuilder()
-                //    .SetBasePath(Directory.GetCurrentDirectory())
-                //    .AddJsonFile("appsettings.json")
-                //    .Build();
+                builder.Services.Configure<JwtSettingsOption>(builder.Configuration.GetSection("JwtSettings"));
+                builder.Services.AddOptions<JwtSettingsOption>("JwtSettings");
+                builder.Services.AddSingleton<JwtHelper>();
+                builder.Services.AddAuthentication(options =>
+                {
+                    options.DefaultAuthenticateScheme = JwtAuthenticationDefaults.AuthenticationScheme;
+                    options.DefaultChallengeScheme = JwtAuthenticationDefaults.AuthenticationScheme;
+                })
+                .AddJwt(options =>
+                {
+                    options.Keys = new string[] { builder.Configuration.GetValue<string>("JwtSettings:SignKey") };
+                    options.VerifySignature = true;
+                });
+
+                builder.Services.AddAuthorization();
+
+
 
                 // https://blog.miniasp.com/post/2021/11/29/How-to-use-Serilog-with-NET-6
                 // Serilog setting https://serilog.net/
-               
+
 
                 // Hide connection info in secrets.json
                 var DatabaseSettings =
@@ -99,13 +116,13 @@ namespace MealsOrderAPI
             catch (Exception ex)
             {
                 Log.Fatal(ex, "Host terminated unexpectedly");
-                return ;
+                return;
             }
             finally
             {
                 Log.CloseAndFlush();
             }
-            
+
         }
 
         private static IEdmModel GetEdmModel()
@@ -118,5 +135,7 @@ namespace MealsOrderAPI
 
             return odataBuilder.GetEdmModel();
         }
+
+        
     }
 }

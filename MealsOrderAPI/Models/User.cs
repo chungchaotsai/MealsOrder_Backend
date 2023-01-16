@@ -31,4 +31,11 @@ namespace MealsOrderAPI.Models
         public string? Email { get; set; }
         public string? Phones { get; set; }
     }
+
+    public class Login
+    {
+        [Required(ErrorMessage = "Name cannot be empty")] public string? Username { get; set; }
+
+        [Required(ErrorMessage = "Name cannot be empty")] public string? Password { get; set; }
+    }
 }
