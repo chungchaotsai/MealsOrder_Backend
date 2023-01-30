@@ -14,6 +14,8 @@ using Serilog;
 using System;
 using AutoMapper.QueryableExtensions;
 using MealsOrderAPI.Common;
+using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
 
 namespace MealsOrderAPI.Controllers
 {
@@ -28,25 +30,42 @@ namespace MealsOrderAPI.Controllers
         private readonly ILogger<UsersController> _logger;
         private readonly IMapper _mapper;
         private readonly JwtHelper _jwtHelper;
-
+        private ClaimsPrincipal _user;
         public UsersController(
             ILogger<UsersController> logger,
             IUsersRepository usersRepository,
             IMapper mapper,
-            JwtHelper jwtHelper
+            JwtHelper jwtHelper,
+            ClaimsPrincipal user
             )
         {
             _usersRepository = usersRepository;
             _logger = logger;
             _mapper = mapper;
             _jwtHelper = jwtHelper;
+            _user = user;
         }
-
+        [AllowAnonymous]
         [HttpPost("Login")]
         public async Task<IActionResult> Login([FromBody] Login login)
         {
-            var token = _jwtHelper.GenerateToken(login.Username);
-            return Ok(new { token });
+            var verify = ValidateUser(login);
+            if (verify)
+            {
+                var token = _jwtHelper.GenerateToken(login.Username);
+                return Ok(new { token });
+
+            } else
+            {
+                return NotFound();
+            }
+        }
+
+        [HttpGet("Claims")]
+        public async Task<IActionResult> GetClaims()
+            
+        {
+            return Ok(_user.Claims.Select(p => new { p.Type, p.Value }));
         }
 
         private bool ValidateUser(Login login)
