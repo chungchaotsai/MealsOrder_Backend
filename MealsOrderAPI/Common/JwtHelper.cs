@@ -32,7 +32,7 @@ namespace MealsOrderAPI.Common
             this.settings = settings.Value;
         }
 
-        public string GenerateToken(string userName, int expireMinutes = 30)
+        public string GenerateToken(string userName,string[] roles, int expireMinutes = 3000)
         {
             var issuer = settings.Issuer;
             var signKey = settings.SignKey;
@@ -45,11 +45,10 @@ namespace MealsOrderAPI.Common
                             .AddClaim("iss", issuer)
                             // .AddClaim("nameid", userName) // User.Identity.Name
                             .AddClaim("sub", userName) // User.Identity.Name
-                                                       // .AddClaim("aud", "The Audience") // 由於你的 API 受眾通常沒有區分特別對象，因此通常不太需要設定，也不太需要驗證
                             .AddClaim("exp", DateTimeOffset.UtcNow.AddMinutes(expireMinutes).ToUnixTimeSeconds())
                             .AddClaim("nbf", DateTimeOffset.UtcNow.ToUnixTimeSeconds())
                             .AddClaim("iat", DateTimeOffset.UtcNow.ToUnixTimeSeconds())
-                            // .AddClaim("roles", new string[] { "Admin", "Users" })
+                            .AddClaim("roles", roles)
                             .AddClaim(ClaimTypes.Name, userName)
                             .Encode();
             return token;

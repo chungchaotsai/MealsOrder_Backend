@@ -16,6 +16,7 @@ using AutoMapper.QueryableExtensions;
 using MealsOrderAPI.Common;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
+using System.Data;
 
 namespace MealsOrderAPI.Controllers
 {
@@ -50,9 +51,11 @@ namespace MealsOrderAPI.Controllers
         public async Task<IActionResult> Login([FromBody] Login login)
         {
             var verify = ValidateUser(login);
+            var roles = new string[] { "Admin", "User" };
             if (verify)
             {
-                var token = _jwtHelper.GenerateToken(login.Username);
+                var token = _jwtHelper.GenerateToken(login.Username, roles);
+
                 return Ok(new { token });
 
             } else
@@ -63,9 +66,22 @@ namespace MealsOrderAPI.Controllers
 
         [HttpGet("Claims")]
         public async Task<IActionResult> GetClaims()
-            
         {
             return Ok(_user.Claims.Select(p => new { p.Type, p.Value }));
+        }
+
+        [HttpGet("Username")]
+        public async Task<IActionResult> GetUsername()
+
+        {
+            return Ok(_user.Identity?.Name);
+        }
+
+        [HttpGet("IsInRole/{name}")]
+        public async Task<IActionResult> GetIsInRole(string name)
+
+        {
+            return Ok(_user.IsInRole(name));
         }
 
         private bool ValidateUser(Login login)

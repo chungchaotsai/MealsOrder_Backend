@@ -14,6 +14,7 @@ using Microsoft.OData.Edm;
 using Microsoft.OData.ModelBuilder;
 using Microsoft.OpenApi.Models;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authentication;
 using Serilog;
 using Serilog.Events;
 using Serilog.Settings.Json;
@@ -22,6 +23,8 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using System.Security.Claims;
+using Microsoft.AspNetCore.Identity;
+using Swashbuckle.AspNetCore.Filters;
 
 namespace MealsOrderAPI
 {
@@ -73,7 +76,12 @@ namespace MealsOrderAPI
                     };
                 });
 
-                builder.Services.AddAuthorization();
+                builder.Services.AddAuthorization(options =>
+                {
+                    options.AddPolicy("EmployeeOnly", policy => policy.RequireClaim("EmployeeNumber"));
+                    options.AddPolicy("Founders", policy =>
+                      policy.RequireClaim("EmployeeNumber", "1", "2", "3", "4", "5"));
+                });
 
 
 
@@ -98,17 +106,26 @@ namespace MealsOrderAPI
                         .AddRouteComponents("odata", GetEdmModel()).Filter().Select().Expand());
                 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
                 builder.Services.AddEndpointsApiExplorer();
-                builder.Services.AddSwaggerGen(c =>
+                builder.Services.AddSwaggerGen(option =>
                 {
-                    c.ResolveConflictingActions(apiDescriptions => apiDescriptions.First());
-                    c.SwaggerDoc("v1", new OpenApiInfo { Title = "MealsOrderAPI", Version = "v1" });
+                    option.ResolveConflictingActions(apiDescriptions => apiDescriptions.First());
+                    option.SwaggerDoc("v1", new OpenApiInfo { Title = "MealsOrderAPI", Version = "v1" });
+                    option.AddSecurityDefinition("oauth2", new OpenApiSecurityScheme
+                    {
+                        Description = "Standard Authorization heeadeer using the Bearer schema (\"bearer {tokeen}\")",
+                        In = ParameterLocation.Header,
+                        Name = "Authorization",
+                        Type = SecuritySchemeType.ApiKey
+
+                    });
+                    option.OperationFilter<SecurityRequirementsOperationFilter>();
                 });
                 builder.Host.UseSerilog();
                 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
                 builder.Services.AddHttpContextAccessor();
                 builder.Services.AddTransient<ClaimsPrincipal>(s =>
-    s.GetService<IHttpContextAccessor>().HttpContext.User);
-
+                    s.GetService<IHttpContextAccessor>().HttpContext.User);
+         
                 var app = builder.Build();
 
                 // Configure the HTTP request pipeline.
@@ -136,8 +153,8 @@ namespace MealsOrderAPI
                 //});
                 app.UseHttpsRedirection();
 
-                app.UseAuthorization();
                 app.UseAuthentication();
+                app.UseAuthorization();
 
                 app.MapControllers();
                 app.UseSerilogRequestLogging();
