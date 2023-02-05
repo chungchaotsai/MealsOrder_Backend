@@ -6,5 +6,7 @@ namespace MealsOrderAPI.Repository.Interface
 {
     public interface IUsersRepository : IRepository<User>
     {
+
+        public SingleResult<User> GetByUsernameNPassword(string name, string password);
     }
 }

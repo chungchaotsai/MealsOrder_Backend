@@ -20,6 +20,7 @@ namespace MealsOrderAPI.Common
     {
         public string Issuer { get; set; } = "";
         public string SignKey { get; set; } = "";
+        public int ExpirationTimeInSeconds { get; set; } = 86400;
     }
     /// <summary>
     /// Ref: https://github.com/doggy8088/AspNetCore6JwtNetAuthN/blob/main/Program.cs
@@ -32,11 +33,11 @@ namespace MealsOrderAPI.Common
             this.settings = settings.Value;
         }
 
-        public string GenerateToken(string userName,string[] roles, int expireMinutes = 3000)
+        public string GenerateToken(string userName,string[] roles)
         {
             var issuer = settings.Issuer;
             var signKey = settings.SignKey;
-
+            var expireTime = settings.ExpirationTimeInSeconds;
             var token = JwtBuilder.Create()
                             .WithAlgorithm(new HMACSHA256Algorithm()) // symmetric
                             .WithSecret(signKey)
@@ -45,7 +46,7 @@ namespace MealsOrderAPI.Common
                             .AddClaim("iss", issuer)
                             // .AddClaim("nameid", userName) // User.Identity.Name
                             .AddClaim("sub", userName) // User.Identity.Name
-                            .AddClaim("exp", DateTimeOffset.UtcNow.AddMinutes(expireMinutes).ToUnixTimeSeconds())
+                            .AddClaim("exp", DateTimeOffset.UtcNow.AddSeconds(Convert.ToDouble(expireTime)))
                             .AddClaim("nbf", DateTimeOffset.UtcNow.ToUnixTimeSeconds())
                             .AddClaim("iat", DateTimeOffset.UtcNow.ToUnixTimeSeconds())
                             .AddClaim("roles", roles)

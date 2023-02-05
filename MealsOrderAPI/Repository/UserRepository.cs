@@ -54,5 +54,10 @@ namespace MealsOrderAPI.Repository
             await _context.SaveChangesAsync();
         }
 
+        public SingleResult<User> GetByUsernameNPassword(string name, string password)
+        {
+            var u = _context.Users.Where(p => p.Name == name && p.Password == password).AsQueryable();
+            return SingleResult.Create(u);
+        }
     }
 }

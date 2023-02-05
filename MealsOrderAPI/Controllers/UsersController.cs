@@ -17,6 +17,9 @@ using MealsOrderAPI.Common;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
 using System.Data;
+using AutoMapper.Execution;
+using Microsoft.EntityFrameworkCore;
+using MealsOrderAPI.Repository;
 
 namespace MealsOrderAPI.Controllers
 {
@@ -86,6 +89,9 @@ namespace MealsOrderAPI.Controllers
 
         private bool ValidateUser(Login login)
         {
+            var q = _usersRepository.GetByUsernameNPassword(login.Username, login.Password);
+            var user = q.Queryable.SingleOrDefault<User>();
+            if (user == null) { return false; }
             return true;
         }
 
