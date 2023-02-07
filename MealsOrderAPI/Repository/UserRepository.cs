@@ -73,7 +73,8 @@ namespace MealsOrderAPI.Repository
                 .Select(a => new Role
                 {
                     Id = a.r.Id,
-                    Name = a.r.Name,
+//TODO: 
+                    Name = a.r.Name.Trim(),
                 });
             return result;
         }

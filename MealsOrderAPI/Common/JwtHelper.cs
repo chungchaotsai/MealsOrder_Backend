@@ -46,7 +46,9 @@ namespace MealsOrderAPI.Common
                             .AddClaim("iss", issuer)
                             // .AddClaim("nameid", userName) // User.Identity.Name
                             .AddClaim("sub", userName) // User.Identity.Name
-                            .AddClaim("exp", DateTimeOffset.UtcNow.AddSeconds(Convert.ToDouble(expireTime)))
+                                                       //.AddClaim("exp", DateTimeOffset.UtcNow.AddSeconds(Convert.ToDouble(expireTime)))
+                                                       //.AddClaim("exp", DateTime.Now.AddDays(1))
+                            .AddClaim("exp", DateTimeOffset.UtcNow.AddMinutes(90).ToUnixTimeSeconds())
                             .AddClaim("nbf", DateTimeOffset.UtcNow.ToUnixTimeSeconds())
                             .AddClaim("iat", DateTimeOffset.UtcNow.ToUnixTimeSeconds())
                             .AddClaim("roles", roles)

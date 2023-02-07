@@ -1,14 +1,7 @@
-﻿using AutoMapper;
-using MealsOrderAPI.Common;
-using MealsOrderAPI.Repository.Interface;
+﻿using MealsOrderAPI.Common;
 using Microsoft.AspNetCore.Mvc;
-using System.Data;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
-using MealsOrderAPI.Models;
-using MealsOrderAPI.Repository;
-using Microsoft.AspNetCore.OData.Query;
-using System.Drawing.Printing;
 
 namespace MealsOrderAPI.Controllers
 {

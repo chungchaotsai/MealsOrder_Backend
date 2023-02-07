@@ -63,8 +63,9 @@ namespace MealsOrderAPI.Controllers
                 {
                     roles.Add(ur.Name);
                 }
+                var roles1 = roles.ToArray();
                 var roles2 = new string[] { "Admin", "User" };
-                var token = _jwtHelper.GenerateToken(login.Username, roles2);
+                var token = _jwtHelper.GenerateToken(login.Username, roles1);
 
                 return Ok(new { token });
 
@@ -110,7 +111,7 @@ namespace MealsOrderAPI.Controllers
 
 
         //Get all users
-        [HttpGet]
+        [HttpGet,Authorize(Roles = "Admin")]
         [EnableQuery(PageSize = 10)]
         public IQueryable<UserDto> Get()
         {
