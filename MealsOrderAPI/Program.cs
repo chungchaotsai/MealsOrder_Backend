@@ -76,12 +76,12 @@ namespace MealsOrderAPI
                     };
                 });
 
-                builder.Services.AddAuthorization(options =>
-                {
-                    options.AddPolicy("EmployeeOnly", policy => policy.RequireClaim("EmployeeNumber"));
-                    options.AddPolicy("Founders", policy =>
-                      policy.RequireClaim("EmployeeNumber", "1", "2", "3", "4", "5"));
-                });
+                //builder.Services.AddAuthorization(options =>
+                //{
+                //    options.AddPolicy("EmployeeOnly", policy => policy.RequireClaim("EmployeeNumber"));
+                //    options.AddPolicy("Founders", policy =>
+                //    policy.RequireClaim("EmployeeNumber", "1", "2", "3", "4", "5"));
+                //});
 
 
 

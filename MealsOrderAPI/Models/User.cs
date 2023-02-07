@@ -9,7 +9,7 @@ namespace MealsOrderAPI.Models
     /// <summary>
     /// 使用者資訊
     /// </summary>
-    [Table("users")]
+    [Table("user")]
     public class User
     {
         public int Id { get; set; }
@@ -19,9 +19,22 @@ namespace MealsOrderAPI.Models
         public string Email { get; set; }
         public string? Password { get; set; }
         public string? Phones { get; set; }
-        public int? AccountId { get; set; }
+        public string? AccountId { get; set; }
+    }
 
+    [Table("role")]
+    public class Role
+    {
+        public int Id { get; set; }
+        public string Name { get; set; }
+    }
 
+    [Table("userrolemap")]
+    public class UserRoleMap
+    {
+        public int Id { get; set; }
+        public int UserId { get; set; }
+        public int RoleId { get; set; }
     }
 
     public class UserDto

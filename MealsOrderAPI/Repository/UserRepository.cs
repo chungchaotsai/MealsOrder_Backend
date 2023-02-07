@@ -20,7 +20,8 @@ namespace MealsOrderAPI.Repository
             try
             {
                 return _context.Users.AsQueryable();
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 Console.WriteLine(ex.ToString());
             }
@@ -35,8 +36,8 @@ namespace MealsOrderAPI.Repository
 
         public async Task Add(User user)
         {
-             _context.Users.AddAsync(user);
-             await _context.SaveChangesAsync();
+            _context.Users.AddAsync(user);
+            await _context.SaveChangesAsync();
         }
 
         public async Task Delete(User user)
@@ -54,10 +55,27 @@ namespace MealsOrderAPI.Repository
             await _context.SaveChangesAsync();
         }
 
-        public SingleResult<User> GetByUsernameNPassword(string name, string password)
+        public SingleResult<User> GetByAccountIdNPassword(string accountId, string password)
         {
-            var u = _context.Users.Where(p => p.Name == name && p.Password == password).AsQueryable();
+            var u = _context.Users.Where(p => p.AccountId == accountId && p.Password == password).AsQueryable();
             return SingleResult.Create(u);
+        }
+
+        public IQueryable<Role> GetRolesByUserId(int userId)
+        {
+            var users = _context.Users;
+            var roles = _context.Roles;
+            var userRoles = _context.UserRoles;
+            var result = users
+                .Where(u => u.Id == userId)
+                .Join(userRoles, u => u.Id, ur => ur.UserId, (u, ur) => new { u, ur })
+                .Join(roles, uur => uur.ur.RoleId, r => r.Id, (uur, r) => new { uur, r })
+                .Select(a => new Role
+                {
+                    Id = a.r.Id,
+                    Name = a.r.Name,
+                });
+            return result;
         }
     }
 }

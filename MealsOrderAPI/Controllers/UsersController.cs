@@ -53,15 +53,23 @@ namespace MealsOrderAPI.Controllers
         [HttpPost("Login")]
         public async Task<IActionResult> Login([FromBody] Login login)
         {
-            var verify = ValidateUser(login);
-            var roles = new string[] { "Admin", "User" };
-            if (verify)
+            var user = ValidateUser(login);
+            if (user != null)
             {
-                var token = _jwtHelper.GenerateToken(login.Username, roles);
+                var urs = _usersRepository.GetRolesByUserId(user.Id).ToList();
+
+                var roles = new List<string>();
+                foreach (var ur in urs)
+                {
+                    roles.Add(ur.Name);
+                }
+                var roles2 = new string[] { "Admin", "User" };
+                var token = _jwtHelper.GenerateToken(login.Username, roles2);
 
                 return Ok(new { token });
 
-            } else
+            }
+            else
             {
                 return NotFound();
             }
@@ -71,6 +79,13 @@ namespace MealsOrderAPI.Controllers
         public async Task<IActionResult> GetClaims()
         {
             return Ok(_user.Claims.Select(p => new { p.Type, p.Value }));
+        }
+
+        [HttpGet("UserRoles/{userId}"), Authorize(Roles = "Admin,Client,God")]
+        public IQueryable<Role> GetUserRoles(int userId)
+        {
+            var rt = _usersRepository.GetRolesByUserId(userId);
+            return rt;
         }
 
         [HttpGet("Username")]
@@ -87,12 +102,10 @@ namespace MealsOrderAPI.Controllers
             return Ok(_user.IsInRole(name));
         }
 
-        private bool ValidateUser(Login login)
+        private User ValidateUser(Login login)
         {
-            var q = _usersRepository.GetByUsernameNPassword(login.Username, login.Password);
-            var user = q.Queryable.SingleOrDefault<User>();
-            if (user == null) { return false; }
-            return true;
+            var q = _usersRepository.GetByAccountIdNPassword(login.Username, login.Password);
+            return q.Queryable.SingleOrDefault<User>();
         }
 
 
