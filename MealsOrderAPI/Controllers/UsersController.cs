@@ -63,9 +63,7 @@ namespace MealsOrderAPI.Controllers
                 {
                     roles.Add(ur.Name);
                 }
-                var roles1 = roles.ToArray();
-                var roles2 = new string[] { "Admin", "User" };
-                var token = _jwtHelper.GenerateToken(login.Username, roles1);
+                var token = _jwtHelper.GenerateToken(user.Name,user.Id, roles.ToArray());
 
                 return Ok(new { token });
 
@@ -89,11 +87,29 @@ namespace MealsOrderAPI.Controllers
             return rt;
         }
 
-        [HttpGet("Username")]
-        public async Task<IActionResult> GetUsername()
+        [HttpGet("Username"),Authorize]
+        public async Task<IActionResult> GetUserName()
 
         {
-            return Ok(_user.Identity?.Name);
+            var identity = HttpContext.User.Identity as ClaimsIdentity;
+            if (identity != null)
+            {
+                return Ok(_user.Identity?.Name);
+            }
+            return NotFound();
+        }
+
+        [HttpGet("UserId"), Authorize]
+        public async Task<IActionResult> GetUserId()
+
+        {
+            var identity = HttpContext.User.Identity as ClaimsIdentity;
+            if (identity != null)
+            {
+                var userId = identity.FindFirst("UserId").Value;
+                return Ok(userId);
+            }
+            return NotFound();
         }
 
         [HttpGet("IsInRole/{name}")]

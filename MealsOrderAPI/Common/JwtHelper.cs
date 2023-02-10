@@ -33,8 +33,17 @@ namespace MealsOrderAPI.Common
             this.settings = settings.Value;
         }
 
-        public string GenerateToken(string userName,string[] roles)
+        public string GenerateToken(string userName,int userId,string[] roles)
         {
+            /**
+             *  iss (Issuer) - jwt簽發者
+                sub (Subject) - jwt所面向的用戶
+                aud (Audience) - 接收jwt的一方
+                exp (Expiration Time) - jwt的過期時間，這個過期時間必須要大於簽發時間
+                nbf (Not Before) - 定義在什麼時間之前，該jwt都是不可用的
+                iat (Issued At) - jwt的簽發時間
+                jti (JWT ID) - jwt的唯一身份標識，主要用來作為一次性token,從而迴避重放攻擊
+             */
             var issuer = settings.Issuer;
             var signKey = settings.SignKey;
             var expireTime = settings.ExpirationTimeInSeconds;
@@ -44,7 +53,7 @@ namespace MealsOrderAPI.Common
                             // 在 RFC 7519 規格中(Section#4)，總共定義了 7 個預設的 Claims，我們應該只用的到兩種！
                             .AddClaim("jti", Guid.NewGuid().ToString()) // JWT ID
                             .AddClaim("iss", issuer)
-                            // .AddClaim("nameid", userName) // User.Identity.Name
+                            .AddClaim("userId", userId) // User.Identity.Name
                             .AddClaim("sub", userName) // User.Identity.Name
                                                        //.AddClaim("exp", DateTimeOffset.UtcNow.AddSeconds(Convert.ToDouble(expireTime)))
                                                        //.AddClaim("exp", DateTime.Now.AddDays(1))
@@ -52,6 +61,7 @@ namespace MealsOrderAPI.Common
                             .AddClaim("nbf", DateTimeOffset.UtcNow.ToUnixTimeSeconds())
                             .AddClaim("iat", DateTimeOffset.UtcNow.ToUnixTimeSeconds())
                             .AddClaim("roles", roles)
+                            .AddClaim(ClaimTypes.SerialNumber, 135)
                             .AddClaim(ClaimTypes.Name, userName)
                             .Encode();
             return token;

@@ -2,9 +2,6 @@
 using MealsOrderAPI.Models;
 using MealsOrderAPI.Repository.Interface;
 using Microsoft.AspNetCore.OData.Results;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
-using System.Reflection.Metadata;
 
 namespace MealsOrderAPI.Repository
 {
@@ -73,7 +70,6 @@ namespace MealsOrderAPI.Repository
                 .Select(a => new Role
                 {
                     Id = a.r.Id,
-//TODO: 
                     Name = a.r.Name.Trim(),
                 });
             return result;
