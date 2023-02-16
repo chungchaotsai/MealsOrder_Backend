@@ -33,6 +33,8 @@ namespace MealsOrderAPI.Repository
 
         public async Task Add(User user)
         {
+            //var u = new User() {AccountId = user.AccountId, Email = user.Email, Password = user.Password, Name = user.Name, Phones = "123" };
+            user.Id = default;
             _context.Users.AddAsync(user);
             await _context.SaveChangesAsync();
         }

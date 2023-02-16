@@ -163,16 +163,7 @@ namespace MealsOrderAPI.Controllers
         {
             try
             {
-                var u = _usersRepository.Get(user.Id);
-                if (u.Queryable.SingleOrDefault() == null)
-                {
-                    await _usersRepository.Add(user);
-                }
-                else
-                {
-                    string title = $"User '{user.Id}' not found in DB";
-                    return HttpContext.ProblemDetailsError(StatusCodes.Status404NotFound, title);
-                }
+                await _usersRepository.Add(user);
             }
             catch (Exception ex)
             {
