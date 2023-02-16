@@ -80,7 +80,7 @@ namespace MealsOrderAPI.Controllers
             return Ok(_user.Claims.Select(p => new { p.Type, p.Value }));
         }
 
-        [HttpGet("UserRoles/{userId}"), Authorize(Roles = "Admin,Client,God")]
+        [HttpGet("UserRoles/{userId}"), Authorize(Roles = "Admin")]
         public IQueryable<Role> GetUserRoles(int userId)
         {
             var rt = _usersRepository.GetRolesByUserId(userId);
@@ -144,6 +144,7 @@ namespace MealsOrderAPI.Controllers
 
         [HttpGet("{Id}")]
         [EnableQuery]
+        [Authorize]
         public SingleResult<UserDto> Get([FromODataUri] int Id)
         {
             var result = _usersRepository.Get(Id).Queryable.Select(u =>
@@ -181,23 +182,32 @@ namespace MealsOrderAPI.Controllers
             return Ok();
         }
 
-        [HttpPut("{id:int}")]
-        public async Task<IActionResult> Put(int id, [FromBody] User user)
+        [Authorize]
+        [HttpPut]
+        public async Task<IActionResult> Put([FromBody] User user)
         {
+            var identity = HttpContext.User.Identity as ClaimsIdentity;
+            var userId= "";
+            if (identity != null)
+            {
+                userId = identity.FindFirst("UserId").Value;
+            }
             try
             {
-                var u = _usersRepository.Get(user.Id);
+                user.Id = int.Parse(userId);
+                await _usersRepository.Update(user);
+                //var u = _usersRepository.Get(int.Parse(userId));
 
-                if (u.Queryable.SingleOrDefault() == null)
-                {
-                    string title = $"User '{user.Id}' not found in DB";
-                    return HttpContext.ProblemDetailsError(StatusCodes.Status404NotFound, title);
+                //if (u.Queryable.SingleOrDefault() == null)
+                //{
+                //    string title = $"User '{userId}' not found in DB";
+                //    return HttpContext.ProblemDetailsError(StatusCodes.Status404NotFound, title);
 
-                }
-                else
-                {
-                    await _usersRepository.Update(user);
-                }
+                //}
+                //else
+                //{
+                //    await _usersRepository.Update(user);
+                //}
             }
             catch (Exception ex)
             {

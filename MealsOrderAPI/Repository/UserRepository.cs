@@ -46,9 +46,12 @@ namespace MealsOrderAPI.Repository
 
         public async Task Update(User user)
         {
-            var u = _context.Users.First(p => p.Id == user.Id);
-            u.Name = user.Name;
-            u.Email = user.Email;
+            var u = _context.Users.Find(user.Id);
+            if (u == null)
+            {
+                return;
+            }
+            _context.Users.Entry(u).CurrentValues.SetValues(user);
             await _context.SaveChangesAsync();
         }
 
