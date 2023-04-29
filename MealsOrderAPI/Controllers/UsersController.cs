@@ -182,6 +182,7 @@ namespace MealsOrderAPI.Controllers
             if (identity != null)
             {
                 userId = identity.FindFirst("UserId").Value;
+                if (userId == null) return Unauthorized();
             }
             try
             {
